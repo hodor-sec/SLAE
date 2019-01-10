@@ -8,6 +8,7 @@ Compile with: gcc -fno-stack-protector -z execstack -fno-pie -o hodor-decrypt-ru
 #include <stdlib.h>
 #include <string.h>
 #include <openssl/aes.h>
+#include <unistd.h>
 
 /* Output encrypted and decrypted */
 void print_data(const char *title, const void* data, int len);
