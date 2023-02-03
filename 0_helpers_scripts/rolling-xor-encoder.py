@@ -23,12 +23,12 @@ def encode():
 	for x in range(0, len(shellcode)):
 		for y in range(0, len(badbytes)):
 			if ((ord(shellcode[x]) ^ encoded[x]) == y):
-				print "\n[!] Encoded shellcode contains bad characters, try again..."
+				print("\n[!] Encoded shellcode contains bad characters, try again...")
 				exit(0)
 		z = ord(shellcode[x]) ^ encoded[x]
 		encoded.append(z)
 
-print '[*] Encoding shellcode ...'
+print('[*] Encoding shellcode ...')
 encode()
 
 # HEX variant
@@ -37,13 +37,13 @@ hex_coded = "\"" + ("".join("\\x%02x" %c for c in encoded)) + "\""
 asm_coded = "EncodedShellcode: db " + (",".join("0x%02x" %c for c in encoded))
 
 # Print format for hex shellcode, e.g. \xaa\xbb\xcc, etc
-print "\n[*] Hex shellcode"
-print hex_coded
+print("\n[*] Hex shellcode")
+print(hex_coded)
 
 # Print format for ASM shellcode, e.g. 0xAA, 0xBB, etc
-print "\n[*] ASM shellcode"
-print asm_coded
+print("\n[*] ASM shellcode")
+print(asm_coded)
 
 # Print the length of the shellcode
-print '\n[*] Length: %d' % (len(encoded)-1)
+print('\n[*] Length: %d' % (len(encoded)-1))
 
